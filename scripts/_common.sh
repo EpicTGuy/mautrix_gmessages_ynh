@@ -10,6 +10,57 @@ get_synapse_db_name() {
 	ynh_app_setting_get --app="$1" --key=db_name
 }
 
+# Value of a key in a top-level section of the current config.yaml, without quotes.
+# Empty if there is no config yet or if the bridge still has to generate it.
+read_bridge_value() {
+    # Parameters: key, top-level section
+    [ -f "$install_dir/config.yaml" ] || return 0
+    local value
+    value=$(sed -n "/^$2:/,/^[a-z_]*:/p" "$install_dir/config.yaml" | grep -m1 -E "^ +$1:" \
+        | sed -E "s/^ +$1: *//; s/^'(.*)'\$/\1/; s/^\"(.*)\"\$/\1/")
+    [ "$value" = "generate" ] || [ "$value" = "null" ] || echo "$value"
+}
+
+# Secrets and admin choices of config.yaml kept as app settings, so that config.yaml
+# can be regenerated from the template at each upgrade without losing them.
+# Existing values of config.yaml are taken over the first time.
+ensure_bridge_settings() {
+    provisioning_shared_secret=$(ynh_app_setting_get --key=provisioning_shared_secret)
+    [ -n "$provisioning_shared_secret" ] || provisioning_shared_secret=$(read_bridge_value shared_secret provisioning)
+    [ -n "$provisioning_shared_secret" ] || provisioning_shared_secret=$(ynh_string_random --length=64)
+
+    public_media_signing_key=$(ynh_app_setting_get --key=public_media_signing_key)
+    [ -n "$public_media_signing_key" ] || public_media_signing_key=$(read_bridge_value signing_key public_media)
+    [ -n "$public_media_signing_key" ] || public_media_signing_key=$(ynh_string_random --length=64)
+
+    # Same format as Synapse's signing key: "ed25519 <key id> <unpadded base64 seed>"
+    direct_media_server_key=$(ynh_app_setting_get --key=direct_media_server_key)
+    [ -n "$direct_media_server_key" ] || direct_media_server_key=$(read_bridge_value server_key direct_media)
+    [ -n "$direct_media_server_key" ] || direct_media_server_key="ed25519 $(ynh_string_random --length=6) $(head -c 32 /dev/urandom | base64 | tr -d '=')"
+
+    ghost_displayname_template=$(ynh_app_setting_get --key=ghost_displayname_template)
+    [ -n "$ghost_displayname_template" ] || ghost_displayname_template=$(read_bridge_value displayname_template network)
+    [ -n "$ghost_displayname_template" ] || ghost_displayname_template='{{or .FullName .PhoneNumber}}'
+
+    backfill_max_initial_messages=$(ynh_app_setting_get --key=backfill_max_initial_messages)
+    [ -n "$backfill_max_initial_messages" ] || backfill_max_initial_messages=$(read_bridge_value max_initial_messages backfill)
+    [ -n "$backfill_max_initial_messages" ] || backfill_max_initial_messages=50
+
+    ynh_app_setting_set --key=provisioning_shared_secret --value="$provisioning_shared_secret"
+    ynh_app_setting_set --key=public_media_signing_key --value="$public_media_signing_key"
+    ynh_app_setting_set --key=direct_media_server_key --value="$direct_media_server_key"
+    ynh_app_setting_set --key=ghost_displayname_template --value="$ghost_displayname_template"
+    ynh_app_setting_set --key=backfill_max_initial_messages --value="$backfill_max_initial_messages"
+}
+
+# The bridge runs with -n (it never writes config.yaml) and needs no write access to its
+# install dir: the binary and the config belong to root, the app user can only read them.
+secure_install_dir() {
+    chown root:"$app" "$install_dir" "$install_dir/mautrix-gmessages" "$install_dir/config.yaml"
+    chmod 750 "$install_dir" "$install_dir/mautrix-gmessages"
+    chmod 640 "$install_dir/config.yaml"
+}
+
 # Enable double puppeting if the admin registered the shared "doublepuppet" appservice in Synapse
 # (https://docs.mau.fi/bridges/general/double-puppeting.html). Nothing happens otherwise.
 configure_double_puppet() {

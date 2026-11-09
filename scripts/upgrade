@@ -36,6 +36,9 @@ encryption_require=$(ynh_app_setting_get --key=encryption_require)
 pickle_key=$(ynh_app_setting_get --key=pickle_key)
 
 print_level=$(ynh_app_setting_get --key=print_level)
+# The config panel stores its choice as "min_level" (name of the key in config.yaml)
+min_level=$(ynh_app_setting_get --key=min_level)
+[ -z "$min_level" ] || print_level=$min_level
 
 ynh_script_progression "Checking version..."
 
@@ -91,13 +94,11 @@ then
     ynh_app_setting_delete --key=botadmin
 fi
 
-
 if [ -z "$async_media" ]
 then
   async_media="false"
   ynh_app_setting_set --key=async_media --value="$async_media"
 fi
-
 
 # The first versions of this package used the WhatsApp logo as bot avatar
 if [ -z "$avatar" ] || [ "$avatar" == "mxc://maunium.net/NeXNQarUbrlYBiPCpprYsRqr" ]
@@ -116,13 +117,11 @@ then
   ynh_app_setting_set --key=username_template --value="$username_template"
 fi
 
-
 if [ -z "$delivery_receipts" ]
 then
   delivery_receipts="false"
   ynh_app_setting_set --key=delivery_receipts --value="$delivery_receipts"
 fi
-
 
 if [ -z "$encryption_default" ]
 then
@@ -141,13 +140,11 @@ then
     ynh_app_setting_set --key=pickle_key --value="$pickle_key"
 fi
 
-
 if [ -z "$print_level" ]
 then
   print_level="info"
   ynh_app_setting_set --key=print_level --value="$print_level"
 fi
-
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -157,7 +154,6 @@ ynh_script_progression "Upgrading source files..."
 
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$install_dir"
-
 
 #=================================================
 # UPDATE A CONFIG FILE
@@ -172,6 +168,12 @@ listrelay="*"
 listuser="@user:domain.tld"
 listadmin="@admin:domain.tld"
 
+# Network options of the config panel (bound to config.yaml, kept as settings)
+aggressive_reconnect=$(ynh_app_setting_get --key=aggressive_reconnect)
+[ -n "$aggressive_reconnect" ] || aggressive_reconnect=$(read_bridge_value aggressive_reconnect network)
+[ -n "$aggressive_reconnect" ] || aggressive_reconnect="false"
+ynh_app_setting_set --key=aggressive_reconnect --value="$aggressive_reconnect"
+ensure_bridge_settings
 ynh_config_add --template="config.yaml" --destination="$install_dir/config.yaml"
 
 listrelay=$listrelay_
@@ -193,8 +195,7 @@ ynh_script_progression "Registering Synapse app-service"
 chmod u+x "$install_dir/mautrix-gmessages" # Execute permissions for app user
 $install_dir/mautrix-gmessages -g -c $install_dir/config.yaml -r /etc/matrix-$synapse_instance/app-service/$app.yaml
 # We need to run mautrix-gmessages -g (registration) as root to be able to write in /etc/matrix-...
-# Then config.yaml somehow gets chown root:root , so we need to chown $app:$app
-chown $app:$app "$install_dir/config.yaml"
+secure_install_dir
 ynh_store_file_checksum "$install_dir/config.yaml"
 
 $synapse_install_dir/update_synapse_for_appservice.sh || ynh_die "Synapse can't restart with the appservice configuration"

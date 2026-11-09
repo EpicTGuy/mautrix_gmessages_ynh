@@ -1,11 +1,11 @@
 # Mautrix Google Messages for YunoHost
 
 Matrix / Synapse puppeting bridge for Google Messages (SMS, MMS and RCS of an Android phone), packaged for [YunoHost](https://yunohost.org).
-Upstream bridge: <https://github.com/mautrix/gmessages> (mautrix-gmessages v26.09, Go / bridgev2).
+Upstream bridge: <https://github.com/mautrix/gmessages> (mautrix-gmessages v26.10, Go / bridgev2).
 
 ## ⚠️ Status: looking for testers
 
-This package installs, upgrades and registers with Synapse correctly (tested on YunoHost 12, Debian 12), but **pairing with a phone has not been tested yet**: I don't have an Android phone.
+This package installs, upgrades, backs up / restores and registers with Synapse correctly (tested on YunoHost 12, Debian 12), but **pairing with a phone has not been tested yet**: I don't have an Android phone.
 
 If you have an Android phone with Google Messages as the default SMS app and want to help, please install it and report how it went in the issues (pairing, sending/receiving SMS, MMS, RCS). If it works, I'll propose it to the YunoHost catalog.
 
@@ -23,7 +23,10 @@ Then, in your Matrix client, open a chat with the bot, send `login qr` and scan 
 
 ## Features of this package
 
-- Config generated from the upstream example configs (mautrix-go v0.31.0), with a config panel for the main settings.
+- Config generated from the upstream example config (v26.10), with a config panel for the main settings: permissions, encryption, display name of contacts, number of past messages imported in new chats, taking back the active session automatically.
+- Settings and bridge secrets are kept across upgrades (`config.yaml` is regenerated from the template, the bridge runs with `-n` and never rewrites it, so upgrades don't print its diff).
+- Hardened: the binary and `config.yaml` belong to root and are only readable by the bridge user; strict systemd sandbox (`systemd-analyze security` ≈ 1.3); listens on 127.0.0.1 only.
+- The bridge shows up as "Matrix (YunoHost)" in the paired devices of the phone.
 - Bridge permissions handled from the install questions and the config panel (no duplicate entries when the same account is admin and user).
 - Double puppeting enabled automatically when a shared `doublepuppet` appservice is registered in Synapse (`/etc/matrix-<synapse instance>/app-service/doublepuppet.yaml`, see <https://docs.mau.fi/bridges/general/double-puppeting.html>).
 

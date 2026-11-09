@@ -55,6 +55,17 @@ services = ["__APP__"]
         bind = ":__INSTALL_DIR__/config.yaml"
         visible = "enable_relaybot"
 
+        [main.bridge.ghost_displayname_template]
+        ask = "Display name of Google Messages contacts in Matrix"
+        type = "string"
+        help = "Go template, see the upstream example config. Default: {{or .FullName .PhoneNumber}}"
+
+        [main.bridge.backfill_max_initial_messages]
+        ask = "How many past messages to import in a new chat?"
+        type = "number"
+        min = 0
+        help = "Applies to chats bridged from now on. 0 disables the import of past messages."
+
     [main.bot]
     name = "Robot Settings"
 
@@ -139,17 +150,6 @@ services = ["__APP__"]
 
     [advanced.network]
     name = "Google Messages specific config options"
-
-        [advanced.network.displayname_template]
-        ask = "Displayname template for SMS users"
-        type = "string"
-        help = "Defaults to '{{or .FullName .PhoneNumber}}'. Available variables: .FullName, .FirstName, .PhoneNumber"
-        bind = ":__INSTALL_DIR__/config.yaml"
-
-        [advanced.network.initial_chat_sync_count]
-        ask = "Number of chats to sync when connecting to Google Messages"
-        type = "number"
-        bind = ":__INSTALL_DIR__/config.yaml"
 
         [advanced.network.aggressive_reconnect]
         ask = "Take back the active session when Google Messages is opened in a browser?"

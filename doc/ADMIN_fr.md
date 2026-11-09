@@ -4,9 +4,17 @@ Une configuration plus fine peut être effectuée en utilisant le panneau de con
 ```/var/www/mautrix_gmessages/config.yaml```
 puis en redémarrant le service mautrix_gmessages.
 
+⚠️ `config.yaml` est régénéré depuis le modèle du paquet à chaque mise à jour : les modifications à la main ne sont gardées que dans une copie de sauvegarde. Utilisez le panneau de configuration pour les options ci-dessous, elles sont conservées d'une mise à jour à l'autre.
+
 #### Permissions des utilisateurs
 Rôles : `relay` < `user` < `admin`. On peut donner un identifiant Matrix (`@jean:exemple.fr`), un nom de serveur (`exemple.fr`) ou `*`. Chaque entrée ne doit apparaître qu'une fois : ne donnez pas au même compte les rôles `user` et `admin`.
 
+
+#### Options conservées aux mises à jour (panneau de configuration, `Main -> Puppetting Bridge Settings`)
+- **Nom affiché des contacts Google Messages dans Matrix** : modèle Go, par exemple `{{or .FullName .PhoneNumber}} (Google Messages)` pour reconnaître les contacts Google Messages d'un coup d'œil.
+- **Nombre d'anciens messages importés dans une nouvelle conversation** : 50 par défaut, pour les conversations pontées à partir de maintenant.
+
+Les secrets de la passerelle (secret de l'API de provisionnement, clés de signature des médias) sont générés une fois puis gardés dans les réglages de l'application.
 
 #### End-to-bridge encryption
 Le robot peut éventuellement chiffrer les messages entre les utilisateurs de Matrix et la passarelle pour cacher les messages du serveur domestique. L'utilisation de Postgres est fortement recommandée lors de l'utilisation du chiffrement end-to-bridge.

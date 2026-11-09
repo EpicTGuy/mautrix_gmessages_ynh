@@ -92,6 +92,10 @@ ynh_app_setting_set --key=pickle_key --value="$pickle_key"
 
 ynh_app_setting_set --key=print_level --value="$print_level"
 
+# Network options of the config panel (bound to config.yaml, kept as settings)
+aggressive_reconnect="false"
+ynh_app_setting_set --key=aggressive_reconnect --value="$aggressive_reconnect"
+
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
@@ -109,6 +113,7 @@ ynh_script_progression "Adding $app's configuration..."
 # as_token="\"This value is generated when generating the registration\""
 # hs_token="\"This value is generated when generating the registration\""
 
+ensure_bridge_settings
 ynh_config_add --template="config.yaml" --destination="$install_dir/config.yaml"
 
 # This calls allows to set multiple users during install question "botusers" specifying them separated by a comma
@@ -126,8 +131,7 @@ ynh_script_progression "Registering Synapse app-service"
 chmod u+x "$install_dir/mautrix-gmessages" # Execute permissions for app user
 $install_dir/mautrix-gmessages -g -c $install_dir/config.yaml -r /etc/matrix-$synapse_instance/app-service/$app.yaml
 # We need to run mautrix-gmessages -g (registration) as root to be able to write in /etc/matrix-...
-# Then config.yaml somehow gets chown root:root , so we need to chown $app:$app
-chown $app:$app "$install_dir/config.yaml"
+secure_install_dir
 ynh_store_file_checksum "$install_dir/config.yaml"
 
 $synapse_install_dir/update_synapse_for_appservice.sh || ynh_die "Synapse can't restart with the appservice configuration"

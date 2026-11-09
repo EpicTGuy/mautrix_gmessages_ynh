@@ -7,9 +7,9 @@ name = "Mautrix Google Messages"
 
 description.en = "Matrix / Synapse puppeting bridge for Google Messages (Android SMS/RCS)"
 description.fr = "Passerelle Matrix / Synapse pour Google Messages (SMS/RCS Android)"
-version = "0.2609.0~ynh1"
+version = "0.2610.0~ynh1"
 
-maintainers = []
+maintainers = ["EpicTGuy"]
 
 [upstream]
 license = "AGPL-3.0-or-later"
@@ -88,12 +88,12 @@ ram.runtime = "128M"
         in_subdir = false
         extract = false
         rename = "mautrix-gmessages"
-        amd64.url = "https://github.com/mautrix/gmessages/releases/download/v0.2609.0/mautrix-gmessages-amd64"
-        amd64.sha256 = "fd5959045fbd80ccfd6e820dc5298e35331cc4b9725b6dfe505279fa6d43ae1d"
-        arm64.url = "https://github.com/mautrix/gmessages/releases/download/v0.2609.0/mautrix-gmessages-arm64"
-        arm64.sha256 = "ff5fa7201171d6b9fc52cf7f115c7a27ba810d82232deaa634d48acb632c47d3"
-        armhf.url = "https://github.com/mautrix/gmessages/releases/download/v0.2609.0/mautrix-gmessages-arm"
-        armhf.sha256 = "3d896cdf604404a6ab903de68943ccaa1df660049e605d4672da25661625c5e4"
+        amd64.url = "https://github.com/mautrix/gmessages/releases/download/v0.2610.0/mautrix-gmessages-amd64"
+        amd64.sha256 = "2693000227748869f12c922e659313c20077bb59acecd52903cabcb0d9484a4f"
+        arm64.url = "https://github.com/mautrix/gmessages/releases/download/v0.2610.0/mautrix-gmessages-arm64"
+        arm64.sha256 = "e27e257138ef255365b3ac85dc8083b25e84dfb3b3a727b13b9697c527fe91e3"
+        armhf.url = "https://github.com/mautrix/gmessages/releases/download/v0.2610.0/mautrix-gmessages-arm"
+        armhf.sha256 = "83cc646c1215c97c4de5cf592befce1c836a6a75ea72c02c6f55e1fea8842d6b"
 
         autoupdate.strategy = "latest_github_release"
         autoupdate.asset.amd64 = "^mautrix-gmessages-amd64$"

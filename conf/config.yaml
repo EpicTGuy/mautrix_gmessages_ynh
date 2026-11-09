@@ -4,7 +4,7 @@ network:
     # {{.FullName}} - Full name provided by the phone
     # {{.FirstName}} - First name provided by the phone
     # {{.PhoneNumber}} - Formatted phone number provided by the phone
-    displayname_template: "{{or .FullName .PhoneNumber}}"
+    displayname_template: '__GHOST_DISPLAYNAME_TEMPLATE__'
     # Settings for how the bridge appears to the phone.
     device_meta:
         # OS name to tell the phone. This is the name that shows up in the paired devices list.
@@ -18,7 +18,7 @@ network:
         type: TABLET
     # Should the bridge aggressively set itself as the active device if the user opens Google Messages in a browser?
     # If this is disabled, the user must manually use the `set-active` command to reactivate the bridge.
-    aggressive_reconnect: false
+    aggressive_reconnect: __AGGRESSIVE_RECONNECT__
     # Number of chats to sync when connecting to Google Messages.
     initial_chat_sync_count: 25
     # Interval at which to ping the phone to check if it's still connected.
@@ -35,6 +35,7 @@ network:
     # within the data receive check interval defined above?
     hacky_stall_detect: false
 
+# Config options that affect the central bridge module.
 bridge:
     # The prefix for commands. Only required in non-management rooms.
     command_prefix: "!gm"
@@ -71,8 +72,8 @@ bridge:
     # How long after an unknown error should the bridge attempt a full reconnect?
     # Must be at least 1 minute. The bridge will add an extra ±20% jitter to this value.
     unknown_error_auto_reconnect: null
-    # Maximum number of times to do the auto-reconnect above.
-    # The counter is per login, but is never reset except on logout and restart.
+    # Maximum number of consecutive auto-reconnects above.
+    # The counter is per login and resets when the login reaches CONNECTED.
     unknown_error_max_auto_reconnects: 10
 
     # Should leaving Matrix rooms be bridged as leaving groups on the remote network?
@@ -104,6 +105,8 @@ bridge:
     enable_send_state_requests: false
     # Should the com.beeper.bridge.identifiers list in global ghost profiles include phone numbers?
     phone_numbers_in_profile: false
+    # Should the bridge use Beeper's view-limited media spec for handling view-once and time-limited media?
+    view_limited_media: false
 
     # What should be done to portal rooms when a user logs out or is logged out?
     # Permitted values:
@@ -337,7 +340,7 @@ analytics:
 provisioning:
     # Shared secret for authentication. If set to "generate" or null, a random secret will be generated,
     # or if set to "disable", the provisioning API will be disabled. Must be at least 16 characters.
-    shared_secret: generate
+    shared_secret: __PROVISIONING_SHARED_SECRET__
     # Whether to allow provisioning API requests to be authed using Matrix access tokens.
     # This follows the same rules as double puppeting to determine which server to contact to check the token,
     # which means that by default, it only works for users on the same server as the bridge.
@@ -363,7 +366,7 @@ public_media:
     enabled: false
     # A key for signing public media URLs.
     # If set to "generate", a random key will be generated.
-    signing_key: generate
+    signing_key: __PUBLIC_MEDIA_SIGNING_KEY__
     # Number of seconds that public media URLs are valid for.
     # If set to 0, URLs will never expire.
     expiry: 0
@@ -398,7 +401,7 @@ direct_media:
     allow_proxy: true
     # Matrix server signing key to make the federation tester pass, same format as synapse's .signing.key file.
     # This key is also used to sign the mxc:// URIs to ensure only the bridge can generate them.
-    server_key: generate
+    server_key: __DIRECT_MEDIA_SERVER_KEY__
 
 # Settings for backfilling messages.
 # Note that the exact way settings are applied depends on the network connector.
@@ -408,7 +411,7 @@ backfill:
     enabled: true
     # Maximum number of messages to backfill in empty rooms.
     # If this is zero or negative, backfill will be disabled in new rooms.
-    max_initial_messages: 50
+    max_initial_messages: __BACKFILL_MAX_INITIAL_MESSAGES__
     # Maximum number of missed messages to backfill after bridge restarts.
     max_catchup_messages: 500
     # If a backfilled chat is older than this number of hours,
