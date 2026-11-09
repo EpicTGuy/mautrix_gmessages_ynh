@@ -73,7 +73,25 @@ set__botname() {
 
 set__ghost_displayname_template() {
     ynh_app_setting_set --key=ghost_displayname_template --value="$ghost_displayname_template"
-    ynh_write_var_in_file --file="$install_dir/config.yaml" --key=displayname_template --value="$ghost_displayname_template" --after="network:"
+    write_yaml_string network displayname_template "$ghost_displayname_template"
+    secure_install_dir
+    ynh_store_file_checksum "$install_dir/config.yaml"
+    ynh_systemctl --service="$app" --action="restart"
+}
+
+set__displayname() {
+    ynh_app_setting_set --key=displayname --value="$displayname"
+    write_yaml_string appservice displayname "$displayname"
+    secure_install_dir
+    ynh_store_file_checksum "$install_dir/config.yaml"
+    ynh_systemctl --service="$app" --action="restart"
+}
+
+set__avatar() {
+    [[ -z "$avatar" || "$avatar" == "remove" || "$avatar" =~ ^mxc://[A-Za-z0-9.:-]+/[A-Za-z0-9_-]+$ ]] \
+        || ynh_die "The avatar must be an mxc:// URI (mxc://server/id), 'remove' or empty."
+    ynh_app_setting_set --key=avatar --value="$avatar"
+    write_yaml_string appservice avatar "$avatar"
     secure_install_dir
     ynh_store_file_checksum "$install_dir/config.yaml"
     ynh_systemctl --service="$app" --action="restart"

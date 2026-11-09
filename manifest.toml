@@ -49,6 +49,9 @@ ram.runtime = "128M"
     help.en = "A system user will be created. Invite @gmessagesbot:localsynapse.servername from an authorized Matrix account to start bridging. Give the Matrix server_name, not the full domain/URL."
     help.fr = "Un utilisateur système sera créé. Inviter @gmessagesbot:localsynapse.servername depuis un compte Matrix autorisé pour démarrer une passerelle. Donner le nom du serveur Matrix, pas le domaine/URL complet."
     default = "gmessagesbot"
+    pattern.regexp = "^[a-z0-9._=-]+$"
+    pattern.error.en = "Lowercase letters, digits and . _ = - only"
+    pattern.error.fr = "Lettres minuscules, chiffres et . _ = - uniquement"
 
     [install.encryption]
     ask.en = "Enable end-to-bridge encryption?"
