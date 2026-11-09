@@ -5,9 +5,9 @@ Upstream bridge: <https://github.com/mautrix/gmessages> (mautrix-gmessages v26.1
 
 ## ⚠️ Status: looking for testers
 
-This package installs, upgrades, backs up / restores and registers with Synapse correctly (tested on YunoHost 12, Debian 12), but **pairing with a phone has not been tested yet**: I don't have an Android phone.
+The YunoHost side of this package is tested on YunoHost 12 / Debian 12: install, upgrades with settings kept, backup / restore, registration with Synapse, config panel.
 
-If you have an Android phone with Google Messages as the default SMS app and want to help, please install it and report how it went in the issues (pairing, sending/receiving SMS, MMS, RCS). If it works, I'll propose it to the YunoHost catalog.
+**Feedback on real use is welcome**: if you have Google Messages as the default SMS app of an Android phone, please install it and report how it went in the issues (pairing, sending/receiving SMS, MMS, RCS). Packages confirmed by testers will be proposed to the YunoHost catalog.
 
 Notes:
 - iPhone is not supported (Google Messages is Android only).
